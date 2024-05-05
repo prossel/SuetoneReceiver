@@ -1,3 +1,10 @@
+# Receive the data from the BLE device and write it to a file
+#
+# to execute this script, run the following command:
+# python3 receiver.py
+#
+# Pierre Rossel 2024-05-05
+
 import asyncio
 from bleak import BleakScanner, BleakClient, BleakError
 import json

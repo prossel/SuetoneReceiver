@@ -2,7 +2,7 @@
 
 Application qui communique en BLE avec l'objet Suetone, principalement pour recevoir les captures de la caméra.
 
-Un projet 2024 de Basile Brun / HEAD-Genève / master Media Design
+Un projet 2024 de [Basile Brun](https://github.com/chap0ng/2023-head-md-future-of-drawing/tree/main/expo) / HEAD-Genève / master Media Design
 
 ## Installation
 

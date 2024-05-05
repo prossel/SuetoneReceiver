@@ -1,21 +1,56 @@
 import asyncio
 from bleak import BleakScanner, BleakClient, BleakError
+import json
 
+client = None
 device_name = "Suetone"  # replace with your device's name
 characteristic_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"  # replace with your characteristic's UUID
 output_file = "output.txt"  # replace with your desired output file
+bytes_to_receive = 0
 
 def notification_handler(sender: int, data: bytearray):
-    print(f"Received: {data} from {sender}")
-    with open(output_file, "ab") as file:
-        # file.write(str(data) + "\n")
+    global output_file
+    global bytes_to_receive
+    
+    # if we have an output file, then write the data to the file
+    if output_file and bytes_to_receive > 0:
+        with open(output_file, "ab") as file:
+            # file.write(str(data) + "\n")
+            
+            # append raw bytes to the file
+            file.write(data)
+
+        bytes_to_receive -= len(data)
+        if bytes_to_receive < 0:
+            print(f"Received more data than expected. Expected: {bytes_to_receive + len(data)}, received: {len(data)}")
+            
+    else:
+        # print(f"Received: {data} from {sender}")
+        print(f"Received: {data}")
+        print(output_file)
+        # if data is JSON like "{FILE: "image.jpg", SIZE: 123456, CHUNK: 12345}", then extract the filename, size and chunk
+        # and save the chunk to a file
+        # if data.startswith(b"{\"file\": "):
+        if b"file" in data:
+            #  trim the leading and trailing whitespaces
+            data_str = data.strip()
+            
+            # convert JSON like data to a dictionary
+            data_dict = json.loads(data_str)
+            print(data_dict)
         
-        # append raw bytes to the file
-        file.write(data)
-        
+            bytes_to_receive = data_dict["size"]
+            
+            output_file = data_dict["file"]
+            print(f"Writing to file {output_file}")
+            
+            # create and reset the file
+            open(output_file, "wb").close()
         
         
 async def run():
+    print (f"Scanning for device with name {device_name}")
+
     scanner = BleakScanner()
     while True:
         devices = await scanner.discover()
@@ -60,4 +95,5 @@ except KeyboardInterrupt:
     loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
 finally:
     # cleanup
+    print("Closing event loop.")
     loop.close()

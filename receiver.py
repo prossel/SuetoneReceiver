@@ -14,27 +14,37 @@ device_name = "Suetone"  # replace with your device's name
 characteristic_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"  # replace with your characteristic's UUID
 output_file = "output.txt"  # replace with your desired output file
 bytes_to_receive = 0
+file = None
 
 def notification_handler(sender: int, data: bytearray):
     global output_file
     global bytes_to_receive
+    global file 
     
     # if we have an output file, then write the data to the file
-    if output_file and bytes_to_receive > 0:
-        with open(output_file, "ab") as file:
+    if file and bytes_to_receive > 0:
+        # with open(output_file, "ab") as file:
             # file.write(str(data) + "\n")
             
-            # append raw bytes to the file
-            file.write(data)
+        # append raw bytes to the file
+        file.write(data)
+        
+        print(".", end="", flush=True)
 
         bytes_to_receive -= len(data)
         if bytes_to_receive < 0:
             print(f"Received more data than expected. Expected: {bytes_to_receive + len(data)}, received: {len(data)}")
+        
+        # close the file if we have received all the data
+        if bytes_to_receive <= 0:
+            print(f"\nFile {output_file} written successfully!")
+            file.close()
+        
             
     else:
         # print(f"Received: {data} from {sender}")
         print(f"Received: {data}")
-        print(output_file)
+        
         # if data is JSON like "{FILE: "image.jpg", SIZE: 123456, CHUNK: 12345}", then extract the filename, size and chunk
         # and save the chunk to a file
         # if data.startswith(b"{\"file\": "):
@@ -49,10 +59,10 @@ def notification_handler(sender: int, data: bytearray):
             bytes_to_receive = data_dict["size"]
             
             output_file = data_dict["file"]
-            print(f"Writing to file {output_file}")
+            print(f"Writing to file {output_file}...")
             
             # create and reset the file
-            open(output_file, "wb").close()
+            file = open(output_file, "wb")
         
         
 async def run():

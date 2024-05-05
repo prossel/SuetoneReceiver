@@ -11,7 +11,7 @@ import json
 
 client = None
 device_name = "Suetone"  # replace with your device's name
-characteristic_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"  # replace with your characteristic's UUID
+characteristic_uuid = "6E400003-1A90-46F9-A2C3-46028A276125"  # replace with your characteristic's UUID
 output_file = "output.txt"  # replace with your desired output file
 bytes_to_receive = 0
 file = None

@@ -110,7 +110,10 @@ except KeyboardInterrupt:
         task.cancel()
     # Gather all tasks and let them finish
     loop.run_until_complete(asyncio.gather(*tasks, return_exceptions=True))
+except BleakError as e:
+    # may be raised if Bluetooth is disabled (happend on macOS when sleep mode is activated)
+    print(f"Error: {e}")
 finally:
     # cleanup
-    print("Closing event loop.")
+    # print("Closing event loop.")
     loop.close()
